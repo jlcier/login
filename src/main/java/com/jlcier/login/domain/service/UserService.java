@@ -12,6 +12,6 @@ public class UserService {
     private final UserRepository repository;
 
     public User save(User user) {
-        return null; // TODO
+        return user; // TODO
     }
 }

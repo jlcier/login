@@ -7,17 +7,17 @@ import com.jlcier.login.domain.entity.User;
 
 public class UserMapper {
 
-    public static User toUser(UserRegisterRequest registerRequest) {
+    public static User toUser(UserRegisterRequest request) {
         User user = new User();
-        user.setUsername(registerRequest.getUsername());
-        user.setPassword(registerRequest.getPassword());
+        user.setUsername(request.getUsername());
+        user.setPassword(request.getPassword());
         return user;
     }
 
-    public static User toUser(UserAuthRequest authRequest) {
+    public static User toUser(UserAuthRequest request) {
         User user = new User();
-        user.setUsername(authRequest.getUsername());
-        user.setPassword(authRequest.getPassword());
+        user.setUsername(request.getUsername());
+        user.setPassword(request.getPassword());
         return user;
     }
 
