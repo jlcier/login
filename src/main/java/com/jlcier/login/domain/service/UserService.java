@@ -14,4 +14,16 @@ public class UserService {
     public User save(User user) {
         return user; // TODO
     }
+
+    public User update(User user) {
+        return repository.save(user);
+    }
+
+    public void delete(User user) {
+        // TODO
+    }
+
+    public User login(User user) {
+        return null; // TODO
+    }
 }
