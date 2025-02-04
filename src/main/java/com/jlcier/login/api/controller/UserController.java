@@ -33,7 +33,7 @@ public class UserController {
         if (service.register(UserMapper.toUser(request)) == null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Username taken");
         }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/login")

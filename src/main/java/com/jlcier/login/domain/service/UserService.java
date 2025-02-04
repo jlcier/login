@@ -19,13 +19,13 @@ public class UserService implements UserDetailsService {
         return repository.save(user);
     }
 
-    public User update(User user) {
-        return repository.save(user);
-    }
+//    public User update(User user) {
+//        return repository.save(user);
+//    }
 
-    public void delete(User user) {
-        // TODO
-    }
+//    public void delete(User user) {
+//        // TODO
+//    }
 
     public User register(User user) {
         if (repository.findByUsername(user.getUsername()) != null) {
@@ -35,9 +35,9 @@ public class UserService implements UserDetailsService {
         return save(user);
     }
 
-    public User login(User user) {
-        return null; // TODO
-    }
+//    public User login(User user) {
+//        return null; // TODO
+//    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/test")
-public class TestSecurity {
+public class TestSecurityController {
 
     @GetMapping("/admin")
     public ResponseEntity<?> testAdmin() {
@@ -19,5 +19,10 @@ public class TestSecurity {
     @GetMapping("/user")
     public ResponseEntity<?> testUser() {
         return ResponseEntity.ok("User ok");
+    }
+
+    @GetMapping("")
+    public ResponseEntity<?> test() {
+        return ResponseEntity.ok("Logged in");
     }
 }

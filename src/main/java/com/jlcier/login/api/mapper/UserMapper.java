@@ -4,6 +4,7 @@ import com.jlcier.login.api.request.UserAuthRequest;
 import com.jlcier.login.api.request.UserRegisterRequest;
 import com.jlcier.login.api.response.UserResponse;
 import com.jlcier.login.domain.entity.User;
+import com.jlcier.login.domain.entity.UserRole;
 
 public class UserMapper {
 
@@ -11,7 +12,7 @@ public class UserMapper {
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPassword(request.getPassword());
-        user.setRole(request.getRole());
+        user.setRole(UserRole.valueOf(request.getRole().toUpperCase()));
         return user;
     }
 
