@@ -16,12 +16,12 @@ public class UserMapper {
         return user;
     }
 
-    public static User toUser(UserAuthRequest request) {
-        User user = new User();
-        user.setUsername(request.getUsername());
-        user.setPassword(request.getPassword());
-        return user;
-    }
+//    public static User toUser(UserAuthRequest request) {
+//        User user = new User();
+//        user.setUsername(request.getUsername());
+//        user.setPassword(request.getPassword());
+//        return user;
+//    }
 
     public static UserResponse toUserResponse(User user) {
         UserResponse response = new UserResponse();

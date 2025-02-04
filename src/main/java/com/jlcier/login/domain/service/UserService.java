@@ -23,9 +23,14 @@ public class UserService implements UserDetailsService {
 //        return repository.save(user);
 //    }
 
-//    public void delete(User user) {
-//        // TODO
-//    }
+    public void delete(User user) {
+        repository.delete(user);
+    }
+
+    public User findById(Long id) {
+        return repository.findById(id).orElse(null);
+    }
+
 
     public User register(User user) {
         if (repository.findByUsername(user.getUsername()) != null) {
@@ -34,10 +39,6 @@ public class UserService implements UserDetailsService {
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         return save(user);
     }
-
-//    public User login(User user) {
-//        return null; // TODO
-//    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

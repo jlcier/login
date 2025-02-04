@@ -6,11 +6,11 @@ import com.jlcier.login.api.request.UserRegisterRequest;
 import com.jlcier.login.config.TokenService;
 import com.jlcier.login.domain.entity.User;
 import com.jlcier.login.domain.service.UserService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,10 +30,11 @@ public class UserController {
         if (!request.getPassword().equals(request.getConfirmation())) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Password confirmation doesn't match");
         }
-        if (service.register(UserMapper.toUser(request)) == null) {
+        User user = UserMapper.toUser(request);
+        if (service.register(user) == null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Username taken");
         }
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toUserResponse(user));
     }
 
     @PostMapping("/login")
@@ -45,9 +46,13 @@ public class UserController {
         return ResponseEntity.ok(token);
     }
 
-    @GetMapping("/logout")
-    public ResponseEntity<?> logout() {
-        // TODO
-        return ResponseEntity.ok("Logout successful");
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        User user = service.findById(id);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+        service.delete(user);
+        return ResponseEntity.ok("User deleted successfully");
     }
 }
