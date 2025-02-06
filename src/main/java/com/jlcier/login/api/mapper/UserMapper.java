@@ -30,6 +30,7 @@ public class UserMapper {
         UserResponse response = new UserResponse();
         response.setId(user.getId());
         response.setUsername(user.getUsername());
+        response.setRole(user.getRole().getRole());
         return response;
     }
 

@@ -24,11 +24,12 @@ public class UserService implements UserDetailsService {
     }
 
     public User update(Long id, User user) {
-        Optional<User> optUser = repository.findById(id);
-        if (optUser.isEmpty()) {
-            throw new BusinessException("User not exists");
-        }
+//        Optional<User> optUser = repository.findById(id);
+//        if (optUser.isEmpty()) {
+//            throw new BusinessException("User not exists");
+//        }
         user.setId(id);
+        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         return save(user);
     }
 

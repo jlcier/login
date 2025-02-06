@@ -48,7 +48,7 @@ public class UserController {
     public ResponseEntity<?> delete(@PathVariable Long id) {
         User user = service.findById(id);
         if (user == null) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not exists");
         }
         service.delete(user);
         return ResponseEntity.ok("User deleted successfully");
@@ -61,22 +61,25 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @RequestBody @Valid UserRegisterRequest request) {
-        User user = UserMapper.toUser(request);
-        User userSaved = service.update(id, user);
-        return ResponseEntity.ok(UserMapper.toUserResponse(userSaved));
+        if (service.findById(id) == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not exists");
+        }
+        User user = service.update(id, UserMapper.toUser(request));
+        return ResponseEntity.ok(UserMapper.toUserResponse(user));
     }
 
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody @Valid UserRegisterRequest request) {
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (service.findById(id) == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not exists");
+        }
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         
-        if (!user.getId().equals(id)) {
+        if (!currentUser.getId().equals(id)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can only update your own profile");
         }
-        
-        user.setUsername(request.getUsername());
-        user.setPassword(new BCryptPasswordEncoder().encode(request.getPassword()));
-        return ResponseEntity.ok(UserMapper.toUserResponse(service.update(id, user)));
-    }
 
+        request.setRole(currentUser.getRole().getRole());
+        return ResponseEntity.ok(UserMapper.toUserResponse(service.update(id, UserMapper.toUser(request))));
+    }
 }
