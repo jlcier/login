@@ -1,6 +1,7 @@
 package com.jlcier.login.domain.service;
 
 import com.jlcier.login.domain.entity.User;
+import com.jlcier.login.domain.exception.BusinessException;
 import com.jlcier.login.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,6 +9,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,9 +23,14 @@ public class UserService implements UserDetailsService {
         return repository.save(user);
     }
 
-//    public User update(User user) {
-//        return repository.save(user);
-//    }
+    public User update(Long id, User user) {
+        Optional<User> optUser = repository.findById(id);
+        if (optUser.isEmpty()) {
+            throw new BusinessException("User not exists");
+        }
+        user.setId(id);
+        return save(user);
+    }
 
     public void delete(User user) {
         repository.delete(user);
@@ -38,6 +47,10 @@ public class UserService implements UserDetailsService {
         }
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         return save(user);
+    }
+
+    public List<User> listAll() {
+        return repository.findAll();
     }
 
     @Override

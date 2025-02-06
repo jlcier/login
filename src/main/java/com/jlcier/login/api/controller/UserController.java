@@ -10,10 +10,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -30,20 +31,17 @@ public class UserController {
         if (!request.getPassword().equals(request.getConfirmation())) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Password confirmation doesn't match");
         }
-        User user = UserMapper.toUser(request);
-        if (service.register(user) == null) {
+        if (service.register(UserMapper.toUser(request)) == null) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Username taken");
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toUserResponse(user));
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid UserAuthRequest request) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
         Authentication auth = authManager.authenticate(usernamePassword);
-        String token = tokenService.generateToken((User) auth.getPrincipal());
-
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(tokenService.generateToken((User) auth.getPrincipal()));
     }
 
     @DeleteMapping("/{id}")
@@ -55,4 +53,30 @@ public class UserController {
         service.delete(user);
         return ResponseEntity.ok("User deleted successfully");
     }
+
+    @GetMapping
+    public ResponseEntity<?> listAll() {
+        return ResponseEntity.status(HttpStatus.OK).body(UserMapper.toUserResponseList(service.listAll()));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody @Valid UserRegisterRequest request) {
+        User user = UserMapper.toUser(request);
+        User userSaved = service.update(id, user);
+        return ResponseEntity.ok(UserMapper.toUserResponse(userSaved));
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody @Valid UserRegisterRequest request) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        
+        if (!user.getId().equals(id)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can only update your own profile");
+        }
+        
+        user.setUsername(request.getUsername());
+        user.setPassword(new BCryptPasswordEncoder().encode(request.getPassword()));
+        return ResponseEntity.ok(UserMapper.toUserResponse(service.update(id, user)));
+    }
+
 }

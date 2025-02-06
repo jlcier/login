@@ -6,6 +6,9 @@ import com.jlcier.login.api.response.UserResponse;
 import com.jlcier.login.domain.entity.User;
 import com.jlcier.login.domain.entity.UserRole;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class UserMapper {
 
     public static User toUser(UserRegisterRequest request) {
@@ -30,4 +33,9 @@ public class UserMapper {
         return response;
     }
 
+    public static List<UserResponse> toUserResponseList(List<User> users) {
+        return users.stream()
+            .map(UserMapper::toUserResponse)
+            .collect(Collectors.toList());
+    }
 }
