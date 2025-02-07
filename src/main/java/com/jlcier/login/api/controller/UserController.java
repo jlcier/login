@@ -14,7 +14,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -81,5 +80,14 @@ public class UserController {
 
         request.setRole(currentUser.getRole().getRole());
         return ResponseEntity.ok(UserMapper.toUserResponse(service.update(id, UserMapper.toUser(request))));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getUser(@PathVariable Long id) {
+        User user = service.findById(id);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not exists");
+        }
+        return ResponseEntity.ok(UserMapper.toUserResponse(user));
     }
 }

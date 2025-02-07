@@ -1,7 +1,6 @@
 package com.jlcier.login.domain.service;
 
 import com.jlcier.login.domain.entity.User;
-import com.jlcier.login.domain.exception.BusinessException;
 import com.jlcier.login.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,7 +10,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,10 +22,6 @@ public class UserService implements UserDetailsService {
     }
 
     public User update(Long id, User user) {
-//        Optional<User> optUser = repository.findById(id);
-//        if (optUser.isEmpty()) {
-//            throw new BusinessException("User not exists");
-//        }
         user.setId(id);
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         return save(user);
