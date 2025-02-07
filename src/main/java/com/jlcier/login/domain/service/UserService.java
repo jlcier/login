@@ -23,7 +23,7 @@ public class UserService implements UserDetailsService {
 
     public User update(Long id, User user) {
         user.setId(id);
-        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+//        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         return save(user);
     }
 

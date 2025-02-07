@@ -3,6 +3,7 @@ package com.jlcier.login.api.controller;
 import com.jlcier.login.api.mapper.UserMapper;
 import com.jlcier.login.api.request.UserAuthRequest;
 import com.jlcier.login.api.request.UserRegisterRequest;
+import com.jlcier.login.api.request.UserRequest;
 import com.jlcier.login.config.TokenService;
 import com.jlcier.login.domain.entity.User;
 import com.jlcier.login.domain.service.UserService;
@@ -59,21 +60,26 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody @Valid UserRegisterRequest request) {
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody @Valid UserRequest request) {
         if (service.findById(id) == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not exists");
         }
-        User user = service.update(id, UserMapper.toUser(request));
-        return ResponseEntity.ok(UserMapper.toUserResponse(user));
+
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!currentUser.getId().equals(id)) {
+            request.setRole(currentUser.getRole().getRole());
+        }
+
+        return ResponseEntity.ok(UserMapper.toUserResponse(service.update(id, UserMapper.toUser(request))));
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody @Valid UserRegisterRequest request) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody @Valid UserRequest request) {
         if (service.findById(id) == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not exists");
         }
+
         User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        
         if (!currentUser.getId().equals(id)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can only update your own profile");
         }
