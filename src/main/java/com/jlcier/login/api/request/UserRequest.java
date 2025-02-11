@@ -1,6 +1,5 @@
 package com.jlcier.login.api.request;
 
-import com.jlcier.login.domain.entity.UserRole;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

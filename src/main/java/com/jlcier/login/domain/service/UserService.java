@@ -48,6 +48,16 @@ public class UserService implements UserDetailsService {
         return repository.findAll();
     }
 
+    public User changePassword(User user, String currentPassword, String newPassword) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        if (!encoder.matches(currentPassword, user.getPassword())) {
+            return null;
+        }
+        user.setPassword(encoder.encode(newPassword));
+        return save(user);
+    }
+
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return repository.findByUsername(username);

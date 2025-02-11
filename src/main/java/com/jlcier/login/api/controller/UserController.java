@@ -2,6 +2,7 @@ package com.jlcier.login.api.controller;
 
 import com.jlcier.login.api.mapper.UserMapper;
 import com.jlcier.login.api.request.UserAuthRequest;
+import com.jlcier.login.api.request.UserChangePWRequest;
 import com.jlcier.login.api.request.UserRegisterRequest;
 import com.jlcier.login.api.request.UserRequest;
 import com.jlcier.login.config.TokenService;
@@ -15,6 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -86,6 +88,20 @@ public class UserController {
 
         request.setRole(currentUser.getRole().getRole());
         return ResponseEntity.ok(UserMapper.toUserResponse(service.update(id, UserMapper.toUser(request))));
+    }
+
+    @PutMapping("/change-password/{id}")
+    public ResponseEntity<?> changePassword(@Valid @RequestBody UserChangePWRequest request) {
+
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Password confirmation doesn't match");
+        }
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (service.changePassword(user, request.getCurrentPassword(), request.getNewPassword()) == null) {
+            return ResponseEntity.badRequest().body("Current password is incorrect");
+        }
+        return ResponseEntity.ok().body("Password changed successfully");
     }
 
     @GetMapping("/{id}")
