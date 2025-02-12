@@ -46,33 +46,18 @@ public class UserController {
         return ResponseEntity.ok(tokenService.generateToken((User) auth.getPrincipal()));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-        User user = service.findById(id);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not exists");
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(@Valid @RequestBody UserChangePWRequest request) {
+
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Password confirmation doesn't match");
         }
-        service.delete(user);
-        return ResponseEntity.ok("User deleted successfully");
-    }
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-    @GetMapping
-    public ResponseEntity<?> listAll() {
-        return ResponseEntity.status(HttpStatus.OK).body(UserMapper.toUserResponseList(service.listAll()));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody @Valid UserRequest request) {
-        if (service.findById(id) == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not exists");
+        if (service.changePassword(user, request.getCurrentPassword(), request.getNewPassword()) == null) {
+            return ResponseEntity.badRequest().body("Current password is incorrect");
         }
-
-        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!currentUser.getId().equals(id)) {
-            request.setRole(currentUser.getRole().getRole());
-        }
-
-        return ResponseEntity.ok(UserMapper.toUserResponse(service.update(id, UserMapper.toUser(request))));
+        return ResponseEntity.ok().body("Password changed successfully");
     }
 
     @PutMapping("/update/{id}")
@@ -90,18 +75,21 @@ public class UserController {
         return ResponseEntity.ok(UserMapper.toUserResponse(service.update(id, UserMapper.toUser(request))));
     }
 
-    @PutMapping("/change-password/{id}")
-    public ResponseEntity<?> changePassword(@Valid @RequestBody UserChangePWRequest request) {
 
-        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Password confirmation doesn't match");
-        }
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    // admin only
 
-        if (service.changePassword(user, request.getCurrentPassword(), request.getNewPassword()) == null) {
-            return ResponseEntity.badRequest().body("Current password is incorrect");
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody @Valid UserRequest request) {
+        if (service.findById(id) == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not exists");
         }
-        return ResponseEntity.ok().body("Password changed successfully");
+
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!currentUser.getId().equals(id)) {
+            request.setRole(currentUser.getRole().getRole());
+        }
+
+        return ResponseEntity.ok(UserMapper.toUserResponse(service.update(id, UserMapper.toUser(request))));
     }
 
     @GetMapping("/{id}")
@@ -111,5 +99,20 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not exists");
         }
         return ResponseEntity.ok(UserMapper.toUserResponse(user));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        User user = service.findById(id);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not exists");
+        }
+        service.delete(user);
+        return ResponseEntity.ok("User deleted successfully");
+    }
+
+    @GetMapping
+    public ResponseEntity<?> listAll() {
+        return ResponseEntity.status(HttpStatus.OK).body(UserMapper.toUserResponseList(service.listAll()));
     }
 }
