@@ -60,19 +60,11 @@ public class UserController {
         return ResponseEntity.ok().body("Password changed successfully");
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody @Valid UserRequest request) {
-        if (service.findById(id) == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not exists");
-        }
-
-        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!currentUser.getId().equals(id)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can only update your own profile");
-        }
-
-        request.setRole(currentUser.getRole().getRole());
-        return ResponseEntity.ok(UserMapper.toUserResponse(service.update(id, UserMapper.toUser(request))));
+    @PutMapping("/update")
+    public ResponseEntity<?> updateUser(@RequestBody @Valid UserRequest request) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        request.setRole(user.getRole().getRole());
+        return ResponseEntity.ok(UserMapper.toUserResponse(service.update(user.getId(), UserMapper.toUser(request))));
     }
 
 
@@ -111,7 +103,7 @@ public class UserController {
         return ResponseEntity.ok("User deleted successfully");
     }
 
-    @GetMapping
+    @GetMapping("/list")
     public ResponseEntity<?> listAll() {
         return ResponseEntity.status(HttpStatus.OK).body(UserMapper.toUserResponseList(service.listAll()));
     }
