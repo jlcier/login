@@ -21,8 +21,13 @@ public class TestSecurityController {
         return ResponseEntity.ok("User ok");
     }
 
+    @GetMapping("/login")
+    public ResponseEntity<?> testLogin() {
+        return ResponseEntity.ok("Logged in");
+    }
+
     @GetMapping("")
     public ResponseEntity<?> test() {
-        return ResponseEntity.ok("Logged in");
+        return ResponseEntity.ok("API Ready");
     }
 }
