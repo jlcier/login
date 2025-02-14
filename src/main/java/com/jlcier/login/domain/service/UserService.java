@@ -23,7 +23,9 @@ public class UserService implements UserDetailsService {
 
     public User update(Long id, User user) {
         user.setId(id);
-//        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+        if (user.getPassword() == null) {
+            user.setPassword(findById(id).getPassword());
+        }
         return save(user);
     }
 
