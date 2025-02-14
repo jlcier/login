@@ -23,7 +23,7 @@ public class UserMapper {
     public static User toUser(UserRequest request) {
         User user = new User();
         user.setUsername(request.getUsername());
-        user.setPassword(request.getRole());
+        user.setRole(UserRole.valueOf(request.getRole().toUpperCase()));
         return user;
     }
 
