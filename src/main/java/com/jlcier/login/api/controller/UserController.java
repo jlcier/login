@@ -63,6 +63,9 @@ public class UserController {
     @PutMapping("/update")
     public ResponseEntity<?> updateUser(@RequestBody @Valid UserRequest request) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user.getUsername().equals(request.getUsername())) {
+            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Username must be different");
+        }
         request.setRole(user.getRole().getRole());
         return ResponseEntity.ok(UserMapper.toUserResponse(service.update(user.getId(), UserMapper.toUser(request))));
     }
